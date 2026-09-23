@@ -8,10 +8,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -60,6 +63,10 @@ public class User {
     @Email(message = "Email should be valid")
     @Column(unique = true) 
     private String email;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name = "account_id", unique = true, referencedColumnName = "account_id") 
+    private Account account;
 
     @CreationTimestamp 
     private LocalDateTime createdAt;
