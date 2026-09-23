@@ -8,4 +8,5 @@ import com.axc.solidprinciples.model.Payment;
 @Repository 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
+    boolean existsByAccountNumber(String accountNumber);
 }

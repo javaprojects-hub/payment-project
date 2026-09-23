@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,6 +43,13 @@ public class Payment {
     @Max(value = 1000000, message = "Amount must be less than or equal to one million rupees") 
     private BigDecimal amount;
 
+
+    @NotNull(message = "Before balance cannot be null")
+    private BigDecimal beforeBalance;
+
+    @NotNull 
+    private BigDecimal afterBalance;
+
    @NotNull(message = "Payment type cannot be null")
    private String paymentType;
 
@@ -51,5 +59,6 @@ public class Payment {
    @CreationTimestamp 
    private LocalDateTime createdAt;
 
-    
+   @UpdateTimestamp 
+    private LocalDateTime updatedAt;
 }

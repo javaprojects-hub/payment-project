@@ -16,7 +16,7 @@ private HelperClass() {
 
 public  static String generateAccountNumber() {
 
-    String accountNumber = ACCOUNT_NUMBER_PREFIX + System.currentTimeMillis() % 10000000000L; // Get last 10 digits of timestamp
+    String accountNumber = ACCOUNT_NUMBER_PREFIX + System.nanoTime() % 10000000000L; // Get last 10 digits of timestamp
 
      return ACCOUNT_NUMBER_PREFIX + String.format("%0" + (ACCOUNT_NUMBER_LENGTH - ACCOUNT_NUMBER_PREFIX.length()) + "d", 
      Long.parseLong(accountNumber.substring(ACCOUNT_NUMBER_PREFIX.length())));
@@ -27,7 +27,7 @@ public  static String generateAccountNumber() {
 
 public static String generatePaymentId() {
 
-    String paymentId = "PAY" + System.currentTimeMillis() % 10000000000L; // Get last 10 digits of timestamp
+    String paymentId = "PAY" + System.nanoTime() % 10000000000L; // Get last 10 digits of timestamp
 
     return paymentId;
 }
