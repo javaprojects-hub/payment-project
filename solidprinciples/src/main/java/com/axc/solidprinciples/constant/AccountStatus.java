@@ -2,6 +2,8 @@ package com.axc.solidprinciples.constant;
 
 public enum AccountStatus {
 
+
+    CREATED,
     ACTIVE,
     INACTIVE,
     CLOSED,

@@ -3,8 +3,8 @@ package com.axc.solidprinciples.constant;
 public enum AccountType {
 
      SAVINGS,
-    CURRENT,
-    SALARY_ACCOUNT;
+     CURRENT,
+     SALARY_ACCOUNT;
 
 
     private AccountType() {

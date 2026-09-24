@@ -57,12 +57,15 @@ public class User {
 
 
     @Column 
-    @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be a 10-digit number") 
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Mobile number must be a 10-digit number") 
     private String mobileNumber;
 
     @Email(message = "Email should be valid")
     @Column(unique = true) 
     private String email;
+
+    @NotNull(message = "AccountType cannot be null, choose any option that which account type do you want") 
+    private int chooseAccountType;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn (name = "account_id", unique = true, referencedColumnName = "account_id") 
