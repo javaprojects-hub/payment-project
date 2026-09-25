@@ -1,6 +1,7 @@
 package com.axc.solidprinciples.service.impl;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +71,8 @@ public class UserServiceImpl implements IUserService {
        account.setAccountId(accountId);
        String accountNumber = HelperClass.generateAccountNumber();
         
-       if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
-    logger.warn("Already existed account number {}, accountId {}", accountNumber, accountId);
+    if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
+    logger.warn("Duplicate account detected account number = {}, accountId = {}", accountNumber, accountId);
     throw new IllegalStateException(
             "Account Number and Account Id already exist in the database"
     );
@@ -92,5 +93,12 @@ public class UserServiceImpl implements IUserService {
      
     }
 
+    // generate otp
+
+    private int generateOtp() {
+
+        int otp = 1000000 + new Random().nextInt(9999999);
+        return otp;
+    }
 
 }
