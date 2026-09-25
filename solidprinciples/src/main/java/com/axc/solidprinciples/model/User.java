@@ -24,7 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity 
-@Table (name = "user",
+@Table (name = "users",
 
     indexes =  { @Index 
         (name = "idx_user_id", columnList = "user_id"), 

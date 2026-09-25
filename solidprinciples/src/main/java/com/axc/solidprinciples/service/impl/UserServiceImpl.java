@@ -8,20 +8,33 @@ import org.springframework.stereotype.Service;
 
 import com.axc.solidprinciples.constant.AccountStatus;
 import com.axc.solidprinciples.constant.AccountType;
+import com.axc.solidprinciples.exception.MobileNumberAlreadyExists;
 import com.axc.solidprinciples.mappers.UserMapper;
 import com.axc.solidprinciples.model.Account;
 import com.axc.solidprinciples.model.User;
+import com.axc.solidprinciples.repository.AccountRepository;
+import com.axc.solidprinciples.repository.UserRepository;
 import com.axc.solidprinciples.service.IUserService;
 import com.axc.solidprinciples.utility.HelperClass;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
-@Service 
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor  
 public class UserServiceImpl implements IUserService {
+
+
+    private final UserRepository userRepository;
+
+    private final AccountRepository accountRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
    
     @Override
+    @Transactional
     public UserResponse createUser(UserRequest userRequest) {
 
         logger.info("Creating user account with request {}", userRequest);
@@ -29,14 +42,22 @@ public class UserServiceImpl implements IUserService {
         if (userRequest == null) {
             throw new IllegalArgumentException("User request cannot be null");
         }
+
+       if (userRepository.existsByMobileNumber(userRequest.getMobileNumber())) {
+         
+        throw new MobileNumberAlreadyExists("Mobile Number already existed with :" + userRequest.getMobileNumber());
+       }
        
           User user = UserMapper.mapToUser(userRequest);
           user.setUserId(HelperClass.generateId());
+          user.setChooseAccountType(userRequest.getChooseAccountType());
           user.setAccount(createAccountForUser(user));
+          
+         User savedUser = userRepository.save(user);
 
           logger.info("User account created successfully with userId {}", user.getUserId());
 
-        return UserMapper.mapToUserResponse(user);
+        return UserMapper.mapToUserResponse(savedUser);
 
     }
 
@@ -45,11 +66,12 @@ public class UserServiceImpl implements IUserService {
      
         logger.info("creating account for user {}", user);
 
+       
+
         Account account = new Account();
         account.setAccountId(HelperClass.generateId());
         account.setAccountNumber(HelperClass.generateAccountNumber());
-
-        logger.info("user is choosing account type user {}", user);
+       logger.info("user is choosing account type user {}", user);
         AccountType type = HelperClass.chooseAccountType(user.getChooseAccountType());
         account.setAccountType(type);
         account.setAccountStatus(AccountStatus.CREATED);
@@ -58,8 +80,9 @@ public class UserServiceImpl implements IUserService {
         account.setAvailableBalance(BigDecimal.valueOf(0));
         account.setUser(user);
 
-        logger.info("Account created successfully for user {}", user.getUserId());
-        return account; 
+       Account savedAccount = accountRepository.save(account);
+        logger.info("Account created successfully for user {}", account);
+        return savedAccount; 
      
     }
 

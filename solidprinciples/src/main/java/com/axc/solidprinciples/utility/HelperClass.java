@@ -3,6 +3,7 @@ package com.axc.solidprinciples.utility;
 import java.security.SecureRandom;
 
 import com.axc.solidprinciples.constant.AccountType;
+import com.axc.solidprinciples.repository.AccountRepository;
 
 public class HelperClass {
 
@@ -14,7 +15,9 @@ private static final int ACCOUNT_NUMBER_LENGTH = 14;
 
 private final static SecureRandom secureRandom = new SecureRandom();
 
-pri
+
+
+
 
 private HelperClass() {
     // private constructor to prevent instantiation
@@ -34,9 +37,7 @@ public  static String generateAccountNumber() {
       accountNumber.append(secureRandom.nextInt(10));
    }
 
-   
-
-   return accountNumber.toString();
+    return accountNumber.toString();
 }
 
 
