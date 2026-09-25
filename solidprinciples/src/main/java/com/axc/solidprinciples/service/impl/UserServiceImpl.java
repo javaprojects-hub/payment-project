@@ -69,8 +69,14 @@ public class UserServiceImpl implements IUserService {
        
 
         Account account = new Account();
-        account.setAccountId(HelperClass.generateId());
-        account.setAccountNumber(HelperClass.generateAccountNumber());
+       String accountId = HelperClass.generateId();
+       account.setAccountId(accountId);
+       String accountNumber = HelperClass.generateAccountNumber();
+
+       if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
+        throw new IllegalStateException("Account Number and Account Id is already existed in the database");
+       }
+        account.setAccountNumber(accountNumber);
        logger.info("user is choosing account type user {}", user);
         AccountType type = HelperClass.chooseAccountType(user.getChooseAccountType());
         account.setAccountType(type);
