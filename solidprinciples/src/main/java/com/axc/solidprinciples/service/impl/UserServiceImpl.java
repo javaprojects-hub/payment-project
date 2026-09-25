@@ -65,16 +65,14 @@ public class UserServiceImpl implements IUserService {
     private Account createAccountForUser(User user) {
      
         logger.info("creating account for user {}", user);
-
-       
-
         Account account = new Account();
        String accountId = HelperClass.generateId();
        account.setAccountId(accountId);
        String accountNumber = HelperClass.generateAccountNumber();
-
+        
        if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
-        throw new IllegalStateException("Account Number and Account Id is already existed in the database");
+        logger.warn("Account Number and Account Id"is existed with {}, {}", accountNumber, accountId);
+        throw new IllegalStateException("Account Number and Account Id is already existed  in the database");
        }
         account.setAccountNumber(accountNumber);
        logger.info("user is choosing account type user {}", user);
