@@ -44,7 +44,7 @@ public class UserServiceImpl implements IUserService {
         }
 
        if (userRepository.existsByMobileNumber(userRequest.getMobileNumber())) {
-         
+        
         throw new MobileNumberAlreadyExists("Mobile Number already existed with :" + userRequest.getMobileNumber());
        }
        
@@ -74,6 +74,7 @@ public class UserServiceImpl implements IUserService {
        String accountNumber = HelperClass.generateAccountNumber();
 
        if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
+        logger.warn("Already exisited account number {}, accountId {}", accountNumber, accountId);
         throw new IllegalStateException("Account Number and Account Id is already existed in the database");
        }
         account.setAccountNumber(accountNumber);
