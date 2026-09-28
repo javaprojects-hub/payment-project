@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.axc.solidprinciples.constant.KycStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -66,6 +68,9 @@ public class User {
 
     @NotNull(message = "AccountType cannot be null, choose any option that which account type do you want") 
     private int chooseAccountType;
+
+    @NotNull(message = "kycStatus cannot be null") 
+    private KycStatus kycStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn (name = "account_id", unique = true, referencedColumnName = "account_id") 
