@@ -65,6 +65,7 @@ public class UserServiceImpl implements IUserService {
     private Account createAccountForUser(User user) {
      
         logger.info("creating account for user {}", user);
+
         Account account = new Account();
        String accountId = HelperClass.generateId();
        account.setAccountId(accountId);
@@ -87,7 +88,9 @@ public class UserServiceImpl implements IUserService {
         account.setUser(user);
 
        Account savedAccount = accountRepository.save(account);
+
         logger.info("Account created successfully for user {}", account);
+        
         return savedAccount; 
      
     }

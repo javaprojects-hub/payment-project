@@ -24,8 +24,9 @@ public class Kyc {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Enumerated(EnumType.STRING)
+    
     @Column(name = "kyc_status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private KycStatus kycStatus;
 
     @OneToMany(

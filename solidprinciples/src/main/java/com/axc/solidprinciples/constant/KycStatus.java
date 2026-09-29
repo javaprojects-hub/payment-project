@@ -1,19 +1,16 @@
 package com.axc.solidprinciples.constant;
 
-public class KycStatus {
+public enum  KycStatus {
 
-// prevent objection outside of class
-private KycStatus() {
-        
-}
 
-private static final String STATUS_VERIFIED = "VERIFIED";
+    VERIFIED,
+    REJECTED,
+    PENDING,
+    IN_PROCESS;
 
-private static final String STATUS_PENDING = "PENDING";
+    private KycStatus() {
 
-private static final String STATUS_REJECTED = "REJECTED";
-
-private static final String STATUS_SUSPECTED = "PROCESS_IN_SUSPECTED";
+    }
 
 
 }
