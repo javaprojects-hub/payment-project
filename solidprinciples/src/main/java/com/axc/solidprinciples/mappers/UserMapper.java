@@ -33,7 +33,7 @@ public class UserMapper {
        user.setAge(userRequest.getAge());
        user.setGender(userRequest.getGender());
        user.setMobileNumber(userRequest.getMobileNumber());
-        user.setEmail(userRequest.getEmail());
+       user.setEmail(userRequest.getEmail());
 
        return user;
     }

@@ -1,6 +1,7 @@
 package com.axc.solidprinciples.utility;
 
 import java.security.SecureRandom;
+import java.util.Random;
 
 import com.axc.solidprinciples.constant.AccountType;
 import com.axc.solidprinciples.repository.AccountRepository;
@@ -85,6 +86,13 @@ public static String generatePaymentId() {
 
     }
   }
+
+
+  // generate 6 digit code
+
+  public static int generateActivateCode() {
+    return 100000 + secureRandom.nextInt(900000);
+}
    
 
 }
