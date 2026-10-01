@@ -10,5 +10,6 @@ import com.axc.solidprinciples.model.Account;
 @Repository 
 public interface AccountRepository extends JpaRepository<Account, UUID>{
 
-    boolean existsByAccountNumberAndAccountId(String accountNumber, String accountId);
+    boolean existsByAccountNumber(String accountNumber);
+    boolean existsByAccountId(String accountId);
 }

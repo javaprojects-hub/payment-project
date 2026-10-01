@@ -22,7 +22,10 @@ import com.axc.solidprinciples.repository.AccountRepository;
 import com.axc.solidprinciples.repository.UserRepository;
 import com.axc.solidprinciples.service.IKycService;
 import com.axc.solidprinciples.service.IUserService;
-import com.axc.solidprinciples.utility.HelperClass;
+import com.axc.solidprinciples.utility.AcountNumberGeneration;
+import com.axc.solidprinciples.utility.ActivationCodeGenerator;
+import com.axc.solidprinciples.utility.ChooseAccountType;
+import com.axc.solidprinciples.utility.UniqueIdGenerator;
 import com.dto.ActivateUserRequest;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
@@ -61,7 +64,7 @@ public class UserServiceImpl implements IUserService {
        }
        
           User user = UserMapper.mapToUser(userRequest);
-          user.setUserId(HelperClass.generateId());
+          user.setUserId(uniqueUserId());
           user.setChooseAccountType(userRequest.getChooseAccountType());
           user.setAccount(createAccountForUser(user));
           
@@ -71,7 +74,7 @@ public class UserServiceImpl implements IUserService {
 
           logger.info("User account created successfully with userId {}", user.getUserId());
 
-         int code =  HelperClass.generateActivateCode(); 
+         int code =  ActivationCodeGenerator.generateActivationCode(); 
 
           CACHE_FOR_ACTIVATION_CODE.put(uniqueKey(), code);
 
@@ -128,19 +131,11 @@ public class UserServiceImpl implements IUserService {
         logger.info("creating account for user {}", user);
 
         Account account = new Account();
-       String accountId = HelperClass.generateId();
-       account.setAccountId(accountId);
-       String accountNumber = HelperClass.generateAccountNumber();
-        
-    if (accountRepository.existsByAccountNumberAndAccountId(accountNumber, accountId)) {
-    logger.warn("Already existed account number {}, accountId {}", accountNumber, accountId);
-    throw new IllegalStateException(
-            "Account Number and Account Id already exist in the database"
-    );
-}
-       account.setAccountNumber(accountNumber);
+       
+       account.setAccountId(uniqueAccountId());
+       account.setAccountNumber(uniqueAccountNumber());
        logger.info("user is choosing account type user {}", user);
-       AccountType type = HelperClass.chooseAccountType(user.getChooseAccountType());
+       AccountType type = ChooseAccountType.chooseAccountType(user.getChooseAccountType());
        account.setAccountType(type);
        account.setAccountStatus(AccountStatus.CREATED);
        account.setLedgerBalance(BigDecimal.valueOf(0));
@@ -160,6 +155,37 @@ public class UserServiceImpl implements IUserService {
     private int uniqueKey() {
 
     return (int) (System.currentTimeMillis() % 10000);
+    }
+
+
+    private String uniqueAccountNumber() {
+
+        String accountNumber = AcountNumberGeneration.generateAccountNumber();
+
+        while (accountRepository.existsByAccountNumber(accountNumber)) {
+            accountNumber = AcountNumberGeneration.generateAccountNumber();
+        }
+        return accountNumber;
+    }
+
+    private String uniqueAccountId() {
+
+        String uniqueId = UniqueIdGenerator.generateUniqueId();
+
+        while (accountRepository.existsByAccountId(uniqueId) ) {
+            uniqueId = UniqueIdGenerator.generateUniqueId();
+        }
+        return uniqueId;
+    }
+
+    private String uniqueUserId() {
+
+        String uniqueId = UniqueIdGenerator.generateUniqueId();
+
+        while (userRepository.existsByUserId(uniqueId) ) {
+            uniqueId = UniqueIdGenerator.generateUniqueId();
+        }
+        return uniqueId;
     }
 	
 

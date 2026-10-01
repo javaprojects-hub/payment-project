@@ -78,4 +78,18 @@ public class GlobalExceptionHandler {
         HttpStatus.CONFLICT);
     }
 
+
+    public ResponseEntity<ProperErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+
+        ProperErrorResponse properErrorResponse = new ProperErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            ex.getMessage(),
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            request.getRequestURI(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(properErrorResponse);
+    }
+
 }
