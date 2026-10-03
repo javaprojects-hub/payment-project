@@ -19,4 +19,6 @@ public class ActivationCodeGenerator {
 
         return Integer.parseInt(activationCode.toString());
     }
+
+
 }
