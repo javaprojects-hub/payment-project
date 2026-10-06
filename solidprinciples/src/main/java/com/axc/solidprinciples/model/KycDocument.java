@@ -19,7 +19,7 @@ public class KycDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "kyc_id", unique = true, nullable = false)
+    @Column(name = "kyc_doc_id", unique = true, nullable = false)
     private Long kycId;
 
     @ManyToOne(fetch = FetchType.LAZY)
