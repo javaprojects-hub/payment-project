@@ -11,6 +11,7 @@ import com.axc.solidprinciples.model.User;
 @Repository 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
+    
     boolean existsByMobileNumber(String mobileNumber);
 
     Optional<User> findByUserId(String userId);
