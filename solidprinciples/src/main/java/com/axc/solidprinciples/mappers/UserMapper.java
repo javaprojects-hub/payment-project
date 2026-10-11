@@ -3,6 +3,7 @@ package com.axc.solidprinciples.mappers;
 import org.springframework.stereotype.Component;
 
 import com.axc.solidprinciples.model.User;
+import com.axc.solidprinciples.utility.MaskAccountNumber;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
@@ -17,7 +18,7 @@ public class UserMapper {
             user.getLastName(),
             user.getAge(),
             user.getGender(),
-            user.getMobileNumber(),
+            MaskAccountNumber.maskAccountNumber(user.getMobileNumber()),
             user.getEmail()
         );
     }
