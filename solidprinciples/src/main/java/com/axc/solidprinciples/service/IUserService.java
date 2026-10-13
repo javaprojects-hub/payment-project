@@ -10,6 +10,7 @@ public interface IUserService {
 
     String activateUser(ActivateUserRequest activateRequest);
     
+    UserResponse getUserByUserId(String userId);
     
  
 }
