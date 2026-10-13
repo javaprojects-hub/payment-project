@@ -11,6 +11,7 @@ import com.axc.solidprinciples.constant.AccountStatus;
 import com.axc.solidprinciples.constant.AccountType;
 import com.axc.solidprinciples.constant.UserStatus;
 import com.axc.solidprinciples.exception.MobileNumberAlreadyExists;
+import com.axc.solidprinciples.exception.UserNotFoundException;
 import com.axc.solidprinciples.mappers.UserMapper;
 import com.axc.solidprinciples.model.Account;
 import com.axc.solidprinciples.model.User;
@@ -147,6 +148,25 @@ public class UserServiceImpl implements IUserService {
      
     }
 
+    
+    @Override
+    public UserResponse getUserByUserId(String userId) {
+
+        logger.info("Fetching user details by userId = {}", userId);
+
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
+
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with userId: " + userId));
+    
+        logger.info("User details fetched successfully for userId = {}", userId);
+
+        return UserMapper.mapToUserResponse(user);
+       
+    }
+
 
     private int uniqueKey() {
 
@@ -183,5 +203,7 @@ public class UserServiceImpl implements IUserService {
         }
         return uniqueId;
     }
+
+
 	
 }
