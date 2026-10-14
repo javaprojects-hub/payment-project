@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.axc.solidprinciples.constant.AccountStatus;
@@ -22,6 +23,7 @@ import com.axc.solidprinciples.service.IUserService;
 import com.axc.solidprinciples.utility.AcountNumberGeneration;
 import com.axc.solidprinciples.utility.ActivationCodeGenerator;
 import com.axc.solidprinciples.utility.ChooseAccountType;
+import com.axc.solidprinciples.utility.PasswordValidate;
 import com.axc.solidprinciples.utility.UniqueIdGenerator;
 import com.dto.ActivateUserRequest;
 import com.dto.UserRequest;
@@ -43,6 +45,8 @@ public class UserServiceImpl implements IUserService {
 
     private static final Map<Integer, Integer> CACHE_FOR_ACTIVATION_CODE = new HashMap<>();
 
+    private  PasswordEncoder passwordEncoder;
+
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
    
     @Override
@@ -55,6 +59,10 @@ public class UserServiceImpl implements IUserService {
             throw new IllegalArgumentException("User request cannot be null");
         }
 
+        if (!PasswordValidate.isValidPassword(userRequest.getPassword())) {
+            throw new IllegalArgumentException("Invalid password format");
+        }
+
        if (userRepository.existsByMobileNumber(userRequest.getMobileNumber())) {
         
         throw new MobileNumberAlreadyExists("Mobile Number already existed with :" + userRequest.getMobileNumber());
@@ -62,6 +70,9 @@ public class UserServiceImpl implements IUserService {
        
           User user = UserMapper.mapToUser(userRequest);
           user.setUserId(uniqueUserId());
+
+          user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+          user.setPassword(userRequest.getPassword());
           user.setChooseAccountType(userRequest.getChooseAccountType());
           user.setAccount(createAccountForUser(user));
           
