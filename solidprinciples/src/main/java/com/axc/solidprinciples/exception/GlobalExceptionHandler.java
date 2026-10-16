@@ -78,7 +78,21 @@ public class GlobalExceptionHandler {
         HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<ProperErrorResponse> handleOtpExpiredException(OtpExpiredException ex, HttpServletRequest request) {
 
+        ProperErrorResponse properErrorResponse = new ProperErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            ex.getMessage(),
+            HttpStatus.BAD_REQUEST,
+            request.getRequestURI(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(properErrorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ProperErrorResponse> handleException(Exception ex, HttpServletRequest request) {
 
         ProperErrorResponse properErrorResponse = new ProperErrorResponse(

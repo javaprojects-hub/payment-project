@@ -15,22 +15,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axc.solidprinciples.service.IUserService;
 import com.dto.ActivateUserRequest;
+import com.dto.UpdateUserRequest;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+
 
 @RestController 
 @RequestMapping("/api/v1/user") 
-@AllArgsConstructor 
 public class UserController {
 
   private final static Logger logger = LoggerFactory.getLogger(UserController.class);
 
   private final IUserService iUserService;
   
-  
+  public UserController(IUserService iUserService) {
+      this.iUserService = iUserService;
+  }
 
   @PostMapping
   public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
@@ -66,5 +68,15 @@ public class UserController {
 
 }
 
+@PatchMapping("/{userId}/update")
+public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+    logger.info("Updating user details for userId = {}", userId);
+
+    UserResponse updatedUserResponse = iUserService.updateUser(userId, updateUserRequest);
+
+    return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
+
+
+}
 
 }

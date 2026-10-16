@@ -12,6 +12,7 @@ import com.axc.solidprinciples.constant.AccountStatus;
 import com.axc.solidprinciples.constant.AccountType;
 import com.axc.solidprinciples.constant.UserStatus;
 import com.axc.solidprinciples.exception.MobileNumberAlreadyExists;
+import com.axc.solidprinciples.exception.OtpExpiredException;
 import com.axc.solidprinciples.exception.UserNotFoundException;
 import com.axc.solidprinciples.mappers.UserMapper;
 import com.axc.solidprinciples.model.Account;
@@ -26,6 +27,7 @@ import com.axc.solidprinciples.utility.ChooseAccountType;
 import com.axc.solidprinciples.utility.PasswordValidate;
 import com.axc.solidprinciples.utility.UniqueIdGenerator;
 import com.dto.ActivateUserRequest;
+import com.dto.UpdateUserRequest;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
@@ -33,7 +35,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor  
+@AllArgsConstructor 
 public class UserServiceImpl implements IUserService {
 
 
@@ -59,15 +61,16 @@ public class UserServiceImpl implements IUserService {
             throw new IllegalArgumentException("User request cannot be null");
         }
 
-        if (!PasswordValidate.isValidPassword(userRequest.getPassword())) {
-            throw new IllegalArgumentException("Invalid password format");
-        }
-
        if (userRepository.existsByMobileNumber(userRequest.getMobileNumber())) {
         
         throw new MobileNumberAlreadyExists("Mobile Number already existed with :" + userRequest.getMobileNumber());
        }
-       
+
+        if (!PasswordValidate.isValidPassword(userRequest.getPassword())) {
+            logger.warn("Invalid password format for user request: {} = ", userRequest);
+            throw new IllegalArgumentException("Invalid password format");
+        }
+
           User user = UserMapper.mapToUser(userRequest);
           user.setUserId(uniqueUserId());
 
@@ -98,7 +101,8 @@ public class UserServiceImpl implements IUserService {
 
         logger.info("processing the activate userstatus = {}", activateRequest);
 
-		
+	
+
 
        User user = userRepository.findByUserId(activateRequest.getUserId())
 
@@ -106,6 +110,13 @@ public class UserServiceImpl implements IUserService {
 
     if (!user.getMobileNumber().equals(activateRequest.getMobileNumber())) {
         throw new RuntimeException("Mobile number does not match");
+    }
+
+     if (ActivationCodeGenerator.isExpiredActivationCode(activateRequest.getActivateCode())) {
+
+        logger.error("Activation code is expired for userId = {}", activateRequest.getUserId());
+         
+        throw new OtpExpiredException("OTP has expired");
     }
 
     if (!CACHE_FOR_ACTIVATION_CODE.containsValue(activateRequest.getActivateCode())) {
@@ -178,6 +189,49 @@ public class UserServiceImpl implements IUserService {
        
     }
 
+     @Override
+    public UserResponse updateUser(String userId, UpdateUserRequest updateUserRequest) {
+       
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
+
+        if (updateUserRequest == null) {
+            throw new IllegalArgumentException("Update request cannot be null");
+        }
+
+        User user = userRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with userId: " + userId));
+
+        if (updateUserRequest.getFirstName() != null) {
+            user.setFirstName(updateUserRequest.getFirstName());
+        }
+
+        if (updateUserRequest.getLastName() != null) {
+            user.setLastName(updateUserRequest.getLastName());
+        }
+
+        if (updateUserRequest.getAge() > 0) {
+            user.setAge(updateUserRequest.getAge());
+        }
+
+        if (updateUserRequest.getGender() != null) {
+            user.setGender(updateUserRequest.getGender());
+        }
+
+        if (updateUserRequest.getMobileNumber() != null || !updateUserRequest.getMobileNumber().isEmpty()) {
+
+            if (userRepository.existsByMobileNumber(updateUserRequest.getMobileNumber())) {
+                throw new MobileNumberAlreadyExists("Mobile Number already existed with :" + updateUserRequest.getMobileNumber());
+            }
+
+            user.setMobileNumber(updateUserRequest.getMobileNumber());
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return UserMapper.mapToUserResponse(updatedUser);
+    }
+
 
     private int uniqueKey() {
 
@@ -214,6 +268,9 @@ public class UserServiceImpl implements IUserService {
         }
         return uniqueId;
     }
+
+
+   
 
 
 	
