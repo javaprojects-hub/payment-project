@@ -2,7 +2,10 @@ package com.axc.solidprinciples.service.impl;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +31,7 @@ import com.axc.solidprinciples.utility.PasswordValidate;
 import com.axc.solidprinciples.utility.UniqueIdGenerator;
 import com.dto.ActivateUserRequest;
 import com.dto.UpdateUserRequest;
+import com.dto.UserAccountResponse;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
@@ -189,6 +193,24 @@ public class UserServiceImpl implements IUserService {
        
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Override
+    public UserResponse getUserByMobileNumber(String mobileNumber) {
+        
+        logger.info("Fetching user details by mobileNumber = {}", mobileNumber);
+
+        if (mobileNumber == null || mobileNumber.isEmpty()) {
+            throw new IllegalArgumentException("Mobile number cannot be null or empty");
+        }
+
+        User user = userRepository.findByMobileNumber(mobileNumber)
+                .orElseThrow(() -> new UserNotFoundException("User not found with mobile number: " + mobileNumber));
+    
+        logger.info("User details fetched successfully for mobileNumber = {}", mobileNumber);
+
+        return UserMapper.mapToUserResponse(user);
+    }
+
      @Override
     public UserResponse updateUser(String userId, UpdateUserRequest updateUserRequest) {
        
@@ -232,6 +254,46 @@ public class UserServiceImpl implements IUserService {
         return UserMapper.mapToUserResponse(updatedUser);
     }
 
+    @Override
+   public List<UserAccountResponse> getAllUsersWithAccounts() {
+
+
+        logger.info("Fetching all users with their associated accounts");
+
+        List<User> users = userRepository.findAllUsersWithAccounts();
+           
+        return users.stream()
+            .filter(Objects::nonNull)
+            .map(user -> {
+                Account account = user.getAccount();
+
+                return new UserAccountResponse(
+
+                        user.getUserId(), 
+                        user.getFirstName(), 
+                        user.getLastName(),
+                         user.getGender(),
+                        user.getEmail(),
+                        user.getMobileNumber(),
+                        
+                        user.getUserStatus() != null
+                                ? user.getUserStatus().toString() : null,
+
+                        account != null ? account.getAccountId() : null,
+                        account != null ? account.getAccountNumber() : null,
+                        account != null && account.getAccountType() != null
+                                ? account.getAccountType().toString() : null,
+                        account != null && account.getAccountStatus() != null
+                                ? account.getAccountStatus().toString() : null
+                );
+            })
+            .toList();
+        
+    }
+
+   
+
+
 
     private int uniqueKey() {
 
@@ -268,6 +330,9 @@ public class UserServiceImpl implements IUserService {
         }
         return uniqueId;
     }
+
+
+    
 
 
    

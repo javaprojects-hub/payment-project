@@ -1,5 +1,7 @@
 package com.axc.solidprinciples.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axc.solidprinciples.service.IUserService;
 import com.dto.ActivateUserRequest;
+import com.dto.ApiResponse;
 import com.dto.UpdateUserRequest;
+import com.dto.UserAccountResponse;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
@@ -68,14 +72,40 @@ public class UserController {
 
 }
 
+@GetMapping ("/{mobileNumber}/info")
+public ResponseEntity<UserResponse> getUserByMobileNumber(@PathVariable String mobileNumber) {
+
+    logger.info("Fetching user details by mobileNumber = {}", mobileNumber);
+
+    UserResponse userResponse = iUserService.getUserByMobileNumber(mobileNumber);
+
+    return new ResponseEntity<>(userResponse, HttpStatus.OK);
+
+}
+
 @PatchMapping("/{userId}/update")
 public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+   
     logger.info("Updating user details for userId = {}", userId);
 
     UserResponse updatedUserResponse = iUserService.updateUser(userId, updateUserRequest);
 
     return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
 
+
+}
+
+
+@GetMapping 
+public ResponseEntity<ApiResponse<List<UserAccountResponse>>> getAllUsersWithAccounts() {
+
+   List<UserAccountResponse> list = iUserService.getAllUsersWithAccounts();
+
+   return new
+           
+        ResponseEntity<>(ApiResponse.success(list,  
+    
+         "Fetched All users and their account details successfully"), HttpStatus.OK);
 
 }
 

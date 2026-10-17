@@ -1,7 +1,10 @@
 package com.axc.solidprinciples.service;
 
+import java.util.List;
+
 import com.dto.ActivateUserRequest;
 import com.dto.UpdateUserRequest;
+import com.dto.UserAccountResponse;
 import com.dto.UserRequest;
 import com.dto.UserResponse;
 
@@ -14,5 +17,9 @@ public interface IUserService {
     UserResponse getUserByUserId(String userId);
     
     UserResponse updateUser(String userId, UpdateUserRequest updateUserRequest);
+
+    UserResponse getUserByMobileNumber(String mobileNumber);
+
+     List<UserAccountResponse> getAllUsersWithAccounts();
  
 }

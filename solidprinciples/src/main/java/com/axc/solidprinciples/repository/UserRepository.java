@@ -1,5 +1,6 @@
 package com.axc.solidprinciples.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByUserId(String userId);
 
+    Optional<User> findByMobileNumber(String mobileNumber);
     
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM User u WHERE u.mobileNumber = :mobileNumber")
@@ -30,5 +32,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM User u WHERE u.userId = :userId")
     Optional<User> findByUserIdForUpdate(@Param("userId") String userId);
+
+
+    @Query(
+        value = "SELECT DISTINCT u FROM User u JOIN FETCH u.accounts",
+        countQuery = "SELECT COUNT(DISTINCT u) FROM User u JOIN u.accounts"
+    ) 
+    List<User> findAllUsersWithAccounts();
     
 }
