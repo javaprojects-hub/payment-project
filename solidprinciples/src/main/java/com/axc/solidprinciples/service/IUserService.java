@@ -2,6 +2,9 @@ package com.axc.solidprinciples.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.dto.ActivateUserRequest;
 import com.dto.UpdateUserRequest;
 import com.dto.UserAccountResponse;
@@ -20,6 +23,6 @@ public interface IUserService {
 
     UserResponse getUserByMobileNumber(String mobileNumber);
 
-     List<UserAccountResponse> getAllUsersWithAccounts();
+     Page<UserAccountResponse> getAllUsersWithAccounts(Pageable pageable);
  
 }

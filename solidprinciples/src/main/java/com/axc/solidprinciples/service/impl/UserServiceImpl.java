@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -254,43 +257,38 @@ public class UserServiceImpl implements IUserService {
         return UserMapper.mapToUserResponse(updatedUser);
     }
 
-    @Override
-   public List<UserAccountResponse> getAllUsersWithAccounts() {
+ @Override
+public Page<UserAccountResponse> getAllUsersWithAccounts(
+        Pageable pageable) {
 
+    logger.info("Fetching users with their associated accounts");
 
-        logger.info("Fetching all users with their associated accounts");
+    Page<User> userPage = userRepository.findAll(pageable);
 
-        List<User> users = userRepository.findAllUsersWithAccounts();
-           
-        return users.stream()
-            .filter(Objects::nonNull)
-            .map(user -> {
-                Account account = user.getAccount();
+    return userPage.map(user -> {
+        Account account = user.getAccount();
 
-                return new UserAccountResponse(
-
-                        user.getUserId(), 
-                        user.getFirstName(), 
-                        user.getLastName(),
-                         user.getGender(),
-                        user.getEmail(),
-                        user.getMobileNumber(),
-                        
-                        user.getUserStatus() != null
-                                ? user.getUserStatus().toString() : null,
-
-                        account != null ? account.getAccountId() : null,
-                        account != null ? account.getAccountNumber() : null,
-                        account != null && account.getAccountType() != null
-                                ? account.getAccountType().toString() : null,
-                        account != null && account.getAccountStatus() != null
-                                ? account.getAccountStatus().toString() : null
-                );
-            })
-            .toList();
-        
-    }
-
+        return new UserAccountResponse(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getGender(),
+                user.getEmail(),
+                user.getMobileNumber(),
+                user.getUserStatus() != null
+                        ? user.getUserStatus().toString()
+                        : null,
+                account != null ? account.getAccountId() : null,
+                account != null ? account.getAccountNumber() : null,
+                account != null && account.getAccountType() != null
+                        ? account.getAccountType().toString()
+                        : null,
+                account != null && account.getAccountStatus() != null
+                        ? account.getAccountStatus().toString()
+                        : null
+        );
+    });
+}
    
 
 
@@ -316,7 +314,7 @@ public class UserServiceImpl implements IUserService {
         String uniqueId = UniqueIdGenerator.generateUniqueId();
 
         while (accountRepository.existsByAccountId(uniqueId) ) {
-            uniqueId = UniqueIdGenerator.generateUniqueId();
+            uniqueId = UniqueIdGenusererator.generateUniqueId();
         }
         return uniqueId;
     }
