@@ -34,9 +34,9 @@ public class UserMapper {
        user.setAge(userRequest.getAge());
        user.setGender(userRequest.getGender());
        user.setMobileNumber(userRequest.getMobileNumber());
-       user.setPassword(String.valueOf((int) (Math.random() * 1000000)));
        user.setEmail(userRequest.getEmail());
-
+       user.setFailedPasswordAttempts(0);
+       user.setTransactionLocked(false);
        return user;
     }
 }

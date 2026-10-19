@@ -14,20 +14,30 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity 
-@Table(name = "transaction")
+@Table(name = "transaction",
+
+   indexes =  { @Index ( name = "idx_transaction_account", columnList = "account_id"),
+                
+                @Index (name = "isx_transaction_reference_id", columnList = "transaction_reference_id")
+}
+)
 public class Transaction {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "transaction_id", unique = true, updatable = false)
+    @Column(name = "transaction_reference_id", unique = true, updatable = false)
     private String transactionReferenceId;
 
     private String accountNumber;
@@ -50,6 +60,13 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+
+    private String failureReason;
 
     @Column(name = "created_at",updatable = false)
     @CreationTimestamp 

@@ -1,6 +1,7 @@
 package com.axc.solidprinciples.service.impl;
 
 import java.math.BigDecimal;
+import java.security.cert.PKIXReason;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import com.axc.solidprinciples.constant.AccountStatus;
 import com.axc.solidprinciples.constant.AccountType;
@@ -81,8 +83,7 @@ public class UserServiceImpl implements IUserService {
           User user = UserMapper.mapToUser(userRequest);
           user.setUserId(uniqueUserId());
 
-          user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-          user.setPassword(userRequest.getPassword());
+         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
           user.setChooseAccountType(userRequest.getChooseAccountType());
           user.setAccount(createAccountForUser(user));
           
@@ -103,6 +104,7 @@ public class UserServiceImpl implements IUserService {
     }
 
 
+    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.REQUIRED)
     @Override
 	public String activateUser(ActivateUserRequest activateRequest) {
 

@@ -71,11 +71,13 @@ public class User {
     @NotNull(message = "AccountType cannot be null, choose any option that which account type do you want") 
     private int chooseAccountType;
 
-
     @NotNull(message = "Password cannot be null")
     @Column(name = "password", nullable = false)
-    private String password;
+    private String passwordHash;
 
+    private int failedPasswordAttempts;
+
+    private boolean transactionLocked;
    
     @Enumerated (EnumType.STRING)
     private UserStatus userStatus = UserStatus.CREATED;

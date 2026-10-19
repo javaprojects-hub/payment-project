@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter 
 public class WithdrawRequest {
 
-    private String password;
+    private String rawPassword;
 
     private String idempotencyKey;
 

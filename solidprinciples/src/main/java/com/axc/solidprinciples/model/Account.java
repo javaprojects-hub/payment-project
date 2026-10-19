@@ -2,6 +2,8 @@ package com.axc.solidprinciples.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,6 +16,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,16 +60,23 @@ public class Account {
     private AccountStatus accountStatus;
 
     @NotNull(message = "Balance cannot be null")
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
     @NotNull(message = "Available balance cannot be null")
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal availableBalance;
 
     @NotNull(message = "Ledger balance cannot be null")
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal ledgerBalance;
 
     @OneToOne(mappedBy = "account") 
     private User user;
+
+
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY) 
+    private List<Transaction> transactions = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

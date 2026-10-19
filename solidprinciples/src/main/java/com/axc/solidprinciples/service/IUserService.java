@@ -23,6 +23,8 @@ public interface IUserService {
 
     UserResponse getUserByMobileNumber(String mobileNumber);
 
+     void deactivateUser();
+
      Page<UserAccountResponse> getAllUsersWithAccounts(Pageable pageable);
  
 }
