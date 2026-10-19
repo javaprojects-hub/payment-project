@@ -63,6 +63,8 @@ public class AccountserviceImpl implements AccountService {
      
 private boolean verifyPassword( String accountNumber, String rawPassword) {
 
+    logger.info("verifying the password | {}");
+
     if (accountNumber == null || accountNumber.isBlank()
             || rawPassword == null || rawPassword.isBlank()) {
         throw new IllegalArgumentException(
@@ -73,7 +75,10 @@ private boolean verifyPassword( String accountNumber, String rawPassword) {
             .findByAccountNumber(accountNumber)
             .orElseThrow(() ->
                     new com.axc.solidprinciples.exception.AccountNotFoundException(
-                            "Account not found"));
+      
+                      "Account not found"));
+
+     logger.info("Account Deatils fetched successfully = {}", account);
 
     User user = account.getUser();
 
@@ -83,6 +88,8 @@ private boolean verifyPassword( String accountNumber, String rawPassword) {
         throw new IllegalStateException(
                 "User is blocked from performing transactions");
     }
+
+
 
     
     if (!passwordEncoder.matches(
@@ -95,6 +102,8 @@ private boolean verifyPassword( String accountNumber, String rawPassword) {
 
         
         if (attempts >= MAX_ATTEMPTS) {
+
+    logger.info("Too Many Attempts reached = {}", attempts);
             user.setTransactionLocked(true);
             user.setUserStatus(UserStatus.BLOCKED);
         }
