@@ -51,5 +51,6 @@ BigDecimal getTotalAmountByAccountIdAndStatus(
 );
  
    
+ Optional<Transaction> findByIdempotencyKey(String idempotencyKey);
 
 }

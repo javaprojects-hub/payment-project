@@ -22,6 +22,8 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Entity 
 @Table(name = "transaction",
@@ -31,6 +33,7 @@ import jakarta.persistence.Table;
                 @Index (name = "isx_transaction_reference_id", columnList = "transaction_reference_id")
 }
 )
+@Data 
 public class Transaction {
 
     @Id 
@@ -67,6 +70,10 @@ public class Transaction {
 
 
     private String failureReason;
+
+    @NotNull(message = "idempotencykey cannot be null") 
+    @Column(name = "idempotency_key", unique = true, updatable = false) 
+    private String idempotencyKey;
 
     @Column(name = "created_at",updatable = false)
     @CreationTimestamp 

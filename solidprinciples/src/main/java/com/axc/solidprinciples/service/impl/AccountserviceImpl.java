@@ -1,6 +1,8 @@
 package com.axc.solidprinciples.service.impl;
 
 
+import java.util.Optional;
+
 import javax.security.auth.login.AccountNotFoundException;
 
 import org.slf4j.Logger;
@@ -8,13 +10,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.axc.solidprinciples.constant.IdempotencyStatus;
 import com.axc.solidprinciples.constant.UserStatus;
 import com.axc.solidprinciples.exception.UserNotFoundException;
 import com.axc.solidprinciples.model.Account;
+import com.axc.solidprinciples.model.IdemoptencyRecord;
+import com.axc.solidprinciples.model.Transaction;
 import com.axc.solidprinciples.model.User;
 import com.axc.solidprinciples.repository.AccountRepository;
+import com.axc.solidprinciples.repository.IdempotencyRepository;
+import com.axc.solidprinciples.repository.TransactionRepository;
 import com.axc.solidprinciples.repository.UserRepository;
 import com.axc.solidprinciples.service.AccountService;
+import com.axc.solidprinciples.utility.RequestHashUtil;
 import com.dto.DepositRequest;
 import com.dto.WithdrawRequest;
 
@@ -30,23 +38,79 @@ public class AccountserviceImpl implements AccountService {
 
     private final UserRepository userRepository;
 
+    private final IdempotencyRepository idempotencyRepository;
+
     private PasswordEncoder passwordEncoder;
 
-    private static final Integer MAX_ATTEMPTS = 3;
+    private final TransactionRepository transactionRepository;
+
+    private static final int MAX_ATTEMPTS = 3;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountserviceImpl.class);
 
     @Override
     public void deposit(DepositRequest depositRequest) {
 
-        logger.info("initiating the deposit method with = {}", depositRequest);
+        logger.info("initiating the deposit method with deposit = {}", depositRequest);
 
-        if ( depositRequest == null) {
+        if (depositRequest == null) {
 
-            throw new IllegalArgumentException("deposit request cannot be null");
+            throw new IllegalArgumentException("depositRequest is cannot be null");
         }
-        
-    }
+
+        if (depositRequest.getIdempotencyKey() == null || depositRequest.getIdempotencyKey().isBlank()) {
+
+             throw new IllegalArgumentException("Idempotency key is required");
+        }
+
+        if (depositRequest.getDepositAmount() == null || depositRequest.getDepositAmount().signum() <= 0) {
+
+            throw new IllegalArgumentException("Deposit amount must be greater than zero");
+        }
+
+       
+
+       logger.info("Fetching the account details {} =" , depositRequest.getAccountNumber());
+
+     Account account =  accountRepository.findByAccountNumber(depositRequest.getAccountNumber())
+                                             .orElseThrow(() -> new com.axc.solidprinciples.exception.AccountNotFoundException("Account Not Found with " + depositRequest.getAccountNumber()));
+                                     
+        if (!verifyPassword(depositRequest.getAccountNumber(), depositRequest.getPassword())) {
+
+          throw new IllegalArgumentException("password is invalid, please check your password and try again");
+       }
+
+      Optional<Transaction> existingTransaction = transactionRepository.findByIdempotencyKey(depositRequest.getIdempotencyKey());
+
+      String requestHash = RequestHashUtil.calculateHash(depositRequest);
+
+        String key = depositRequest.getIdempotencyKey();
+
+      var existing =  idempotencyRepository
+                .findByAccountNumberAndOperationAndIdempotencyKey(
+                        account.getAccountNumber(),
+                        "DEPOSIT",
+                        key);
+
+        if (existing.isPresent()) {
+            IdemoptencyRecord record = existing.get();
+
+            if (!record.getRequestHash().equals(requestHash)) {
+                throw new IllegalArgumentException(
+                        "Idempotency key reused with different request");
+            }
+
+            if (record.getStatus() == IdempotencyStatus.SUCCESS) {
+                return ;
+            }
+
+            throw new IllegalStateException(
+                    "A request with this key is already in progress");
+        }
+
+
+
+   }
 
     @Override
     public void withdraw(WithdrawRequest withdrawRequest) {

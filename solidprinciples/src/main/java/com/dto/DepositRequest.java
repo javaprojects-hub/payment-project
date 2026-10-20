@@ -11,9 +11,9 @@ public class DepositRequest {
 
    private String idempotencyKey;
 
-   private String accountNuber;
+   private String accountNumber;
 
    private String accountType;
 
-   private BigDecimal withdrawlAmount;
+   private BigDecimal depositAmount;
 }
